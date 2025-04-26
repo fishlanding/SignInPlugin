@@ -5,7 +5,7 @@ import asyncio
 
 class SignInManager:
     def __init__(self):
-        self.records_file = "plugins\CheckinPlugin\data\checkins.json"
+        self.records_file = "plugins/SignInPlugin/data/signins.json"
         self.records = {}
 
     async def load_records(self):
