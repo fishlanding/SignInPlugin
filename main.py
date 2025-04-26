@@ -7,7 +7,7 @@ from plugins.SignInPlugin.api.image_fetcher import ImageFetcher
 import random
 import datetime
 
-@register(name="DailySignInPlugin", description="A daily sign-in plugin with anime images and fortune", version="1.0", author="Grok")
+@register(name="SignInPlugin", description="普通的签到插件", version="0.1", author="YuWan_SAMA")
 class SignInPlugin(BasePlugin):
     def __init__(self, host: APIHost):
         self.signin_manager = SignInManager()
@@ -34,10 +34,16 @@ class SignInPlugin(BasePlugin):
             launcher_id = str(ctx.event.launcher_id)
             launcher_type = ctx.event.launcher_type
 
+            # 获取发送者昵称，区分私聊和群聊
+            if isinstance(ctx.event, PersonMessageReceived):
+                nickname = ctx.event.sender.nickname
+            else:  # GroupMessageReceived
+                nickname = getattr(ctx.event, 'sender_name', None) or getattr(ctx.event, 'sender', {}).get('nickname', f"用户{user_id}")
+
             today = datetime.date.today().isoformat()
             if self.signin_manager.has_signed_in(user_id, today):
                 await ctx.send_message(launcher_type, launcher_id, MessageChain([
-                    f"@{ctx.event.sender.nickname} 你今天已经签到过了！明天再来吧！"
+                    f"@{nickname} 你今天已经签到过了！明天再来吧！"
                 ]))
                 return
 
@@ -47,7 +53,7 @@ class SignInPlugin(BasePlugin):
                 fortune = random.choice(self.fortunes)
                 
                 await ctx.send_message(launcher_type, launcher_id, MessageChain([
-                    f"@{ctx.event.sender.nickname}\n",
+                    f"@{nickname}\n",
                     Image(url=img_info['url']),
                     f"今日运势：{fortune}"
                 ]))
