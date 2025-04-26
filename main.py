@@ -1,6 +1,6 @@
-from pkg.platform.types import MessageChain, Image
 from pkg.plugin.context import register, handler, BasePlugin, APIHost, EventContext
 from pkg.plugin.events import PersonMessageReceived, GroupMessageReceived
+from pkg.platform.types import *
 import re
 from plugins.SignInPlugin.api.signin_manager import SignInManager
 from plugins.SignInPlugin.api.image_fetcher import ImageFetcher
@@ -37,7 +37,8 @@ class SignInPlugin(BasePlugin):
             today = datetime.date.today().isoformat()
             if self.signin_manager.has_signed_in(user_id, today):
                 await ctx.send_message(launcher_type, launcher_id, MessageChain([
-                    f"@{nickname} 你今天已经签到过了！明天再来吧！"
+                    At(nickname),
+                    f"你今天已经签到过了！明天再来吧！"
                 ]))
                 return
 
@@ -47,7 +48,7 @@ class SignInPlugin(BasePlugin):
                 fortune = random.choice(self.fortunes)
                 
                 await ctx.send_message(launcher_type, launcher_id, MessageChain([
-                    f"@{nickname}\n",
+                    At(nickname),
                     Image(url=img_info['url']),
                     f"今日运势：{fortune}"
                 ]))
