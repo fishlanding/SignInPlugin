@@ -1,5 +1,4 @@
 import httpx
-import asyncio
 
 class ImageFetcher:
     async def get_random_image(self):

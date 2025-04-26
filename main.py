@@ -1,25 +1,18 @@
 from pkg.plugin.context import register, handler, BasePlugin, APIHost, EventContext
-from pkg.plugin.events import PersonMessageReceived, GroupMessageReceived
+from pkg.plugin.events import GroupMessageReceived
 from pkg.platform.types import *
 import re
 from plugins.SignInPlugin.api.signin_manager import SignInManager
 from plugins.SignInPlugin.api.image_fetcher import ImageFetcher
-import random
+from plugins.SignInPlugin.api.fortunes import get_fortune
 import datetime
 
-@register(name="SignInPlugin", description="普通的签到插件", version="0.1", author="YuWan_SAMA")
+@register(name="SignInPlugin", description="普通的签到插件", version="0.2", author="YuWan_SAMA")
 class SignInPlugin(BasePlugin):
     def __init__(self, host: APIHost):
         self.signin_manager = SignInManager()
         self.image_fetcher = ImageFetcher()
-        self.fortunes = [
-            "大吉: 今天是幸运的一天，抓住机会！",
-            "吉: 顺利的一天，保持好心情。",
-            "中吉: 稳扎稳打，会有收获。",
-            "小吉: 小心谨慎，平稳度过。",
-            "末吉: 低调行事，避免麻烦。",
-            "凶: 保持冷静，谨慎决策。"
-        ]
+        from plugins.SignInPlugin.api.fortunes import get_fortune
 
     async def initialize(self):
         await self.signin_manager.load_records()
@@ -45,7 +38,7 @@ class SignInPlugin(BasePlugin):
             try:
                 img_info = await self.image_fetcher.get_random_image()
                 self.signin_manager.record_signin(user_id, today)
-                fortune = random.choice(self.fortunes)
+                fortune = get_fortune()
                 
                 await ctx.send_message(launcher_type, launcher_id, MessageChain([
                     At(nickname),
