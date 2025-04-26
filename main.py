@@ -24,7 +24,6 @@ class SignInPlugin(BasePlugin):
     async def initialize(self):
         await self.signin_manager.load_records()
 
-    @handler(PersonMessageReceived)
     @handler(GroupMessageReceived)
     async def message_received(self, ctx: EventContext):
         msg = str(ctx.event.message_chain).strip()
@@ -33,12 +32,7 @@ class SignInPlugin(BasePlugin):
             user_id = str(ctx.event.sender_id)
             launcher_id = str(ctx.event.launcher_id)
             launcher_type = ctx.event.launcher_type
-
-            # 获取发送者昵称，区分私聊和群聊
-            if isinstance(ctx.event, PersonMessageReceived):
-                nickname = ctx.event.sender.nickname
-            else:  # GroupMessageReceived
-                nickname = getattr(ctx.event, 'sender_name', None) or getattr(ctx.event, 'sender', {}).get('nickname', f"用户{user_id}")
+            nickname = f"{user_id}"
 
             today = datetime.date.today().isoformat()
             if self.signin_manager.has_signed_in(user_id, today):
