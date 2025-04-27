@@ -7,12 +7,11 @@ from plugins.SignInPlugin.api.image_fetcher import ImageFetcher
 from plugins.SignInPlugin.api.fortunes import get_fortune
 import datetime
 
-@register(name="SignInPlugin", description="普通的签到插件", version="0.2", author="YuWan_SAMA")
+@register(name="SignInPlugin", description="普通的签到插件", version="0.2.1", author="YuWan_SAMA")
 class SignInPlugin(BasePlugin):
     def __init__(self, host: APIHost):
         self.signin_manager = SignInManager()
         self.image_fetcher = ImageFetcher()
-        from plugins.SignInPlugin.api.fortunes import get_fortune
 
     async def initialize(self):
         await self.signin_manager.load_records()
