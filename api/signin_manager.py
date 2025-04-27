@@ -1,33 +1,36 @@
 import json
-import os
-import asyncio
+from datetime import date
 
 class SignInManager:
-    def __init__(self):
-        self.records_file = "plugins/SignInPlugin/data/signins.json"
-        self.records = {}
+    def __init__(self, file_path="../data/signin_data.json"):
+        self.file_path = file_path
+        self.data = self.load_data()
 
     async def load_records(self):
+        """异步加载签到记录"""
+        self.data = self.load_data()
+
+    def load_data(self):
         try:
-            if os.path.exists(self.records_file):
-                with open(self.records_file, 'r', encoding='utf-8') as f:
-                    self.records = json.load(f)
-        except Exception as e:
-            print(f"Error loading sign-in records: {e}")
+            with open(self.file_path, "r") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {}
+        except json.JSONDecodeError:
+            return {}
 
-    async def save_records(self):
-        try:
-            with open(self.records_file, 'w', encoding='utf-8') as f:
-                json.dump(self.records, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            print(f"Error saving sign-in records: {e}")
+    def save_data(self):
+        with open(self.file_path, "w") as f:
+            json.dump(self.data, f, indent=4)
 
-    def has_signed_in(self, user_id: str, date: str) -> bool:
-        return user_id in self.records and self.records[user_id].get('last_signin') == date
+    def has_signed_in(self, user_id, date_str):
+        # 将用户ID转换为字符串以确保一致性
+        return self.data.get(str(user_id), {}).get(date_str, False)
 
-    def record_signin(self, user_id: str, date: str):
-        self.records[user_id] = {
-            'last_signin': date,
-            'total_signins': self.records.get(user_id, {}).get('total_signins', 0) + 1
-        }
-        asyncio.create_task(self.save_records())
+    def record_signin(self, user_id, date_str):
+        # 将用户ID转换为字符串以确保一致性
+        uid = str(user_id)
+        if uid not in self.data:
+            self.data[uid] = {}
+        self.data[uid][date_str] = True
+        self.save_data()
